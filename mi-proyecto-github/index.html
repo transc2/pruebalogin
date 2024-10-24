@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - TransCano</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Fondo claro */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .menu-container {
+            background-color: #ffffff; /* Fondo blanco para el menú */
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 30px;
+            width: 300px;
+        }
+        h1 {
+            color: #000; /* Color principal para el título */
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #ffcb22; /* Color del botón */
+            color: white; /* Color del texto del botón */
+            border: none;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Suaviza el cambio de color */
+            width: 100%;
+            font-size: 16px; /* Tamaño del texto */
+        }
+        button:hover {
+            background-color: #E64A19; /* Color del botón al pasar el ratón */
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <h1>Menú Principal</h1>
+        <button onclick="location.href='guia.html'">Guía de Envío</button>
+        <button onclick="location.href='cotizacion.html'">Cotización</button>
+        <button onclick="logout()">Salir</button>
+    </div>
+
+    <script>
+        function logout() {
+            // Aquí puedes agregar la lógica para cerrar sesión
+            alert('Has cerrado sesión.');
+            location.href = 'login.html'; // Redirigir a la página de login
+        }
+    </script>
+</body>
+</html>
+

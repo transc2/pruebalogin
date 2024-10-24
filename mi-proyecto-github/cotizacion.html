@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización - TransCano</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .formulario {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #pdf-content {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            background-color: white;
+            position: relative;
+            display: none;
+            /* Ocultamos el contenido mientras no se usa */
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 500px;
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        header {
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFC107;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #000;
+        }
+
+        fieldset {
+            border: 1px solid #FFC107;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        legend {
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            z-index: 1;
+            position: relative;
+        }
+
+        th,
+        td {
+            border: 1px solid #FFC107;
+            padding: 5px;
+            text-align: center;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin: 13px 0;
+            box-sizing: border-box;
+            overflow: hidden; /* Evita el desbordamiento de texto */
+    white-space: pre-wrap; /* Asegura que el texto largo se ajuste */
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            overflow: hidden; /* Evita el desbordamiento de texto */
+    white-space: pre-wrap; /* Asegura que el texto largo se ajuste */
+        }
+
+        button {
+            margin: 10px 0;
+            padding: 10px 15px;
+            background-color: #FFC107;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ffca28;
+        }
+
+        #logo {
+            max-width: 150px;
+            margin: auto;
+        }
+
+        .negrita {
+            font-weight: bold;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .datos-cliente {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .datos-cliente div {
+            width: 48%;
+            /* Dos columnas */
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 5000px) {
+            #logo {
+                max-width: 125px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            h2 {
+                font-size: 16px;
+            }
+            
+        }
+        @media only screen and (max-width: 600px) {
+    #pdf-content {
+        width: 100vw;
+        min-height: 100vh;
+        padding: 10px;
+    }
+    .formulario, .container {
+        width: 95vw;
+        margin: 5vw;
+    }
+}
+
+    </style>
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+    <section class="formulario">
+        <header>
+            <img src="logo.jpg" alt="Logo de la Empresa" id="logo">
+            <h1>Importadora TransCano</h1>
+            <h2>Venta de maquinaria y servicios mecánicos</h2>
+            <p>Cotización N°: <span id="numeroCotizacion">01001</span></p>
+        </header>
+
+        <img src="logo.jpg" class="watermark" alt="Marca de Agua">
+
+        <h2 class="centro">Cotización</h2>
+
+        <form id="cotizacionForm">
+
+            <fieldset>
+                <legend>Datos del Cliente</legend>
+                <div class="datos-cliente">
+                    <div>
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" placeholder="Nombre del cliente" rows="2" required>
+                    </div>
+                    <div>
+                        <label for="telefono">Teléfono:</label>
+                        <input type="text" id="telefono" placeholder="Teléfono" rows="2" required>
+                    </div>
+                    <div>
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" placeholder="E-mail" rows="2" required>
+                    </div>
+                    <div>
+                        <label for="direccion">Dirección:</label>
+                        <input type="text" id="direccion" class="direccion-larga" placeholder="Dirección" rows="2" required>
+                    </div>
+                </div>
+            </fieldset>
+
+
+            <fieldset>
+                <legend>Descripción del Servicio</legend>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cant.</th>
+                            <th>Descripción</th>
+                            <th>Precio Unitario</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicios">
+                        <tr>
+                            <td><input type="number" value="1" onchange="calcularTotal(this)" min="1"  rows="2" required></td>
+                            <td><textarea class="descripcion-larga" placeholder="Descripción del servicio" rows="3"
+                                    required></textarea></td>
+                            <td><input type="number" placeholder="Precio Unitario" onchange="calcularTotal(this)"
+                                    min="0" step="0.01"  rows="2" required></td>
+                            <td><input type="number" placeholder="Total"  row="2" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" onclick="agregarFila()">Agregar Fila</button>
+            </fieldset>
+
+            <fieldset>
+                <legend>Totales</legend>
+                <div class="datos-cliente">
+                <div>
+                    <label for="total" rows="2" >Total:</label>
+                    <input type="number" id="total" placeholder="Total" row="2" readonly>
+                </div>
+                <div>
+                    <label for="impuesto">Impuesto:</label>
+                    <input type="number" id="impuesto" placeholder="" rows="2" onchange="calcularTotalPagar()" min="0"
+                        step="0.01">
+                </div>
+                </div>
+                <label for="totalPagar">Total a Pagar:</label>
+                <input type="number" id="totalPagar" placeholder="Total a Pagar" rows="2" readonly>
+            </fieldset>
+            <div class="signature-section">
+                <br>
+                <p><strong>Firma del Encargado:</strong></p>
+                <br>
+                <span>________________________________</span> <br>
+                <span>Luis Cano</span>
+            </div>
+            <button type="btn" onclick="generarPDF()">Descargar Cotización en PDF</button>
+            <button type="btn" onclick="nuevaCotizacion()">Agregar Nueva Cotización</button>
+            <button type="btn" onclick="location.href='index.html'">Regresar al Menú</button>
+        </form>
+    </section>
+
+    <script>
+        let numeroCotizacion = 1001;
+
+        function agregarFila() {
+            const tabla = document.getElementById('servicios');
+            const nuevaFila = document.createElement('tr');
+            nuevaFila.innerHTML =
+                `<td><input type="number" value="1" onchange="calcularTotal(this)" min="1" required></td>
+                <td><textarea class="descripcion-larga" placeholder="Descripción del servicio" rows="3" required></textarea></td>
+                <td><input type="number" placeholder="Precio Unitario" onchange="calcularTotal(this)" min="0" step="0.01" required></td>
+                <td><input type="number" placeholder="Total" readonly></td>`;
+            tabla.appendChild(nuevaFila);
+        }
+
+        function calcularTotal(element) {
+            const row = element.closest('tr');
+            const quantity = row.querySelector('input[type="number"]').value;
+            const unitPrice = row.querySelector('input[placeholder="Precio Unitario"]').value;
+            const totalInput = row.querySelector('input[readonly]');
+            totalInput.value = (quantity * unitPrice).toFixed(2);
+            calcularTotalPagar();
+        }
+
+        function calcularTotalPagar() {
+            const totalInputs = document.querySelectorAll('#servicios input[readonly]');
+            let total = 0;
+
+            totalInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            const impuesto = parseFloat(document.getElementById('impuesto').value) || 0;
+            document.getElementById('total').value = total.toFixed(2);
+            document.getElementById('totalPagar').value = (total + impuesto).toFixed(2);
+        }
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pdfContent = document.querySelector(".formulario");
+            if (!pdfContent) {
+                console.error("Elemento de contenido no encontrado.");
+                return;
+            }
+            
+            const container = document.querySelector('.container');
+            const botones = document.querySelectorAll('button'); // Seleccionar todos los botones
+
+// Ocultar botones antes de generar el PDF
+botones.forEach(boton => boton.style.display = 'none');
+            html2canvas(pdfContent, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF('p', 'mm', 'a4');
+
+                // Set the image to fit the PDF
+                const imgWidth = 90; // Width of A4
+                const pageHeight = pdf.internal.pageSize.height;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = 2;
+
+                pdf.addImage(imgData, 'PNG', 60, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 30, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save("cotizacion.pdf");
+                botones.forEach(boton => boton.style.display = 'block');
+
+
+            }).catch(error => {
+                console.error("Error en la captura del PDF:", error);
+            });
+        }
+
+        function autoResize(textarea) {
+    textarea.style.height = 'auto'; // Reiniciar la altura
+    textarea.style.height = (textarea.scrollHeight) + 'px'; // Ajustar según el contenido
+}
+
+
+        function nuevaCotizacion() {
+            numeroCotizacion++;
+            document.getElementById("numeroCotizacion").textContent = String(numeroCotizacion).padStart(5, '0');
+            document.getElementById("cotizacionForm").reset();
+            const totalInputs = document.querySelectorAll('#servicios input[readonly]');
+            totalInputs.forEach(input => input.value = '');
+            calcularTotalPagar();
+        }
+        html2canvas(document.getElementById('elemento-a-capturar'), {
+    width: 800, // Aumenta el área de captura
+    height: 1200, // Aumenta la altura si es necesario
+    scale: 2  // Aumenta la escala para mejorar la calidad
+});
+    </script>
+</body>
+
+</html>
